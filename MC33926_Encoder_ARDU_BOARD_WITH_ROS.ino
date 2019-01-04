@@ -1,8 +1,3 @@
-// MC33926 pwm versus current measurement (CSV output for Excel etc.)
-// FÜR ARDUMOWER PCB 1.2
-
-
-
 #include <Arduino.h>
 #include "RunningMedian.h"
 #include "TimerThree.h"
@@ -133,6 +128,7 @@ ISR(PCINT2_vect, ISR_NOBLOCK){
 // IN1 PinPWM         IN2 PinDir
 // PWM                L     Forward
 // nPWM               H     Reverse
+
 void setMC33926(int pinDir, int pinPWM, int speed) {
   speed *= 4;
   if (speed < 0) {
@@ -213,33 +209,6 @@ void loop()
   Serial.println("pwm_l,pwm_r,sense");
   nh.spinOnce();
   delay(1);
-
-
-//
-//  
-//  beschleunigung(); 
-// // delay(500);
-//  bremsen(); 
-//
-//  beschleunigung_z(); 
-// // delay(500);
-//  bremsen_z(); 
-////  setMC33926(pinMotorLeftDir, pinMotorLeftPWM, 0);
-////  setMC33926(pinMotorRightDir, pinMotorRightPWM, 0);
-////    delay(1000);
-////
-////      setMC33926(-100, pinMotorLeftPWM, 0);
-////      setMC33926(-100, pinMotorRightPWM, 0);
-////    delay(1000);
-////  setMC33926(pinMotorLeftDir, pinMotorLeftPWM, 0);
-////  setMC33926(pinMotorLeftDir, pinMotorRightPWM, 0);
-//
-// // while (true);
-//   
-//  
-// // delay(500);
-
-
 }
 
 void beschleunigung() {
