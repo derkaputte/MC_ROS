@@ -40,11 +40,16 @@ boolean odometryRightLastState2;
     
 
 
-void motor_speed_l_cb( const std_msgs::UInt16& cmd_msg, int speed){
-  speed = cmd_msg.data; //set servo angle, should be from 0-180  
+void motor_speed_l_cb( const std_msgs::UInt16& cmd_msg, int speed_l){
+  speed_l = cmd_msg.data; //set servo angle, should be from 0-180  
+}
+void motor_speed_r_cb( const std_msgs::UInt16& cmd_msg, int speed_r){
+  speed_r = cmd_msg.data; //set servo angle, should be from 0-180  
 }
 
-ros::Subscriber<std_msgs::UInt16> sub("servo", motor_speed_l_cb);
+ros::Subscriber<std_msgs::UInt16> sub("speed_l", motor_speed_l_cb);
+ros::Subscriber<std_msgs::UInt16> sub("speed_r", motor_speed_l_cb);
+
 
 // Determines the rotation count and direction of the odometry encoders. Called in the odometry pins interrupt.
 // encoder signal/Ardumower pinout etc. at http://wiki.ardumower.de/index.php?title=Odometry
@@ -129,19 +134,31 @@ ISR(PCINT2_vect, ISR_NOBLOCK){
 // PWM                L     Forward
 // nPWM               H     Reverse
 
-void setMC33926(int pinDir, int pinPWM, int speed) {
-  speed *= 4;
-  if (speed < 0) {
+void setMC33926_l(int pinDir, int pinPWM, int speed_l) {
+  speed_l *= 4;
+  if (speed_l < 0) {
     digitalWrite(pinDir, HIGH ) ;
     //analogWrite(pinPWM, 255 - ((byte)abs(speed)));
-    Timer3.setPwmDuty(pinPWM, 1023 - abs(speed));
+    Timer3.setPwmDuty(pinPWM, 1023 - abs(speed_l));
   } else {
     digitalWrite(pinDir, LOW) ;
     //analogWrite(pinPWM, ((byte)speed));
-    Timer3.setPwmDuty(pinPWM, speed);
+    Timer3.setPwmDuty(pinPWM, speed_l);
   }
 }
 
+void setMC33926_r(int pinDir, int pinPWM, int speed_r) {
+  speed_r *= 4;
+  if (speed_r < 0) {
+    digitalWrite(pinDir, HIGH ) ;
+    //analogWrite(pinPWM, 255 - ((byte)abs(speed)));
+    Timer3.setPwmDuty(pinPWM, 1023 - abs(speed_r));
+  } else {
+    digitalWrite(pinDir, LOW) ;
+    //analogWrite(pinPWM, ((byte)speed));
+    Timer3.setPwmDuty(pinPWM, speed_r);
+  }
+}
 
 void setup()
 {
@@ -211,6 +228,8 @@ void loop()
   delay(1);
 }
 
+
+/*
 void beschleunigung() {
     for (int speed=0; speed <= 125; speed += 10){    
     setMC33926(pinMotorLeftDir, pinMotorLeftPWM, speed);
@@ -292,3 +311,5 @@ void bremsen_z() {
     }    
   } 
 }
+
+*/
