@@ -3,7 +3,9 @@
 #include "TimerThree.h"
 #include <ros.h>
 #include <std_msgs/UInt16.h>
+#include <std_msgs/Float32.h>
 
+std_msgs::Float32 ticks_l;
 ros::NodeHandle  nh;
 
 #define pinMotorEnable  37         // EN motors enable
@@ -47,9 +49,10 @@ void motor_speed_r_cb( const std_msgs::UInt16& cmd_msg, int speed_r){
   speed_r = cmd_msg.data; //set servo angle, should be from 0-180  
 }
 
-ros::Subscriber<std_msgs::UInt16> sub("speed_l", motor_speed_l_cb);
-ros::Subscriber<std_msgs::UInt16> sub("speed_r", motor_speed_l_cb);
 
+ros::Subscriber<std_msgs::UInt16> sub("speed_l", motor_speed_l_cb);
+ros::Subscriber<std_msgs::UInt16> sub("speed_r", motor_speed_r_cb);
+ros::Publisher pub_ticks_l("ticks_left", &ticks_l_msg);
 
 // Determines the rotation count and direction of the odometry encoders. Called in the odometry pins interrupt.
 // encoder signal/Ardumower pinout etc. at http://wiki.ardumower.de/index.php?title=Odometry
@@ -185,6 +188,7 @@ void setup()
  
   nh.initNode();
   nh.subscribe(sub);
+  nh.advertise(pub_ticks_l);
 
   Serial.println("START");  
   
@@ -226,6 +230,8 @@ void loop()
   Serial.println("pwm_l,pwm_r,sense");
   nh.spinOnce();
   delay(1);
+  ticks_l_msg.data = odometryLeft;
+  pub_ticks_l.publish(&ticks_l_msg);
 }
 
 
