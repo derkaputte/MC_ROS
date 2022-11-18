@@ -111,7 +111,7 @@ ISR(PCINT2_vect, ISR_NOBLOCK){
 
 void setMC33926(int pinDir, int pinPWM, int speed) {
 // void setMC33926_l(int pinDir, int pinPWM, int speed_l) {
-  speed_l *= 4;
+  speed *= 4;
   if (speed < 0) {
     digitalWrite(pinDir, HIGH ) ;
     //analogWrite(pinPWM, 255 - ((byte)abs(speed)));
@@ -198,37 +198,104 @@ void setup()
 void loop()
 {
   Serial.println("pwm_l,pwm_r,sense");
-  unsigned long lastticks = 0;
-  for (int speed=0; speed <= 255; speed += 5){    
+  unsigned long lastticks_l = 0;
+  unsigned long lastticks_r = 0;
+  unsigned long ticks_l = 0;
+  unsigned long ticks_r = 0;
+  for (int speed=255; speed >= -250; speed -= 10){
     setMC33926(pinMotorLeftDir, pinMotorLeftPWM, speed);
-    delay(500);
-    lastticks = ticks;         
-    delay(1000);        
-    unsigned long stopticks = ticks;            
-    unsigned long stopTime = millis() + 1000;        
+    setMC33926(pinMotorRightDir, pinMotorRightPWM, speed);
+    delay(200);
+    int speed_l = speed;
+    int speed_r = speed;
+    lastticks_l = odometryLeft;
+    lastticks_r = odometryRight;
+    delay(200);
+    unsigned long stopticks_l = ticks_l;
+    unsigned long stopticks_r = ticks_r;
+    unsigned long stopTime = millis() + 1000;
     for (int i=0; i < 10; i++){
       //while (millis() < stopTime){
-      int sense = 0;
-      sense = analogRead(pinMotorLeftSense);
+      int sense_l = 0;
+      sense_l = analogRead(pinMotorLeftSense);
+      int sense_r = 0;
+      sense_r = analogRead(pinMotorRightSense);
       //measurements.clear();
       /*for (int i=0; i < 100; i++){
         sense = analogRead(pinMotorLeftSense);
        measurements.add(sense);
       }*/
-      //int fault = digitalRead(pinMotorLeftFault);      
-      Serial.print(speed);
-      Serial.print(",");    
-      Serial.print(stopticks-lastticks);
-      Serial.print(",");    
+      //int fault = digitalRead(pinMotorLeftFault);
+      Serial.print(speed_l);
+      Serial.print(",");
+      Serial.print(speed_r);
+      Serial.print(",");
+      Serial.print(odometryLeft);
+      Serial.print(",");
+      Serial.print(odometryRight);
+      Serial.print(",");
+      Serial.print(stopticks_l-lastticks_l);
+      Serial.print(",");
+      Serial.print(stopticks_r-lastticks_r);
+      Serial.print(",");
       //float curr;
       //measurements.getAverage(curr);
-      Serial.print(sense);
-      //Serial.print(",");    
+      Serial.print(sense_l);
+      Serial.print(",");
+      Serial.print(sense_r);
+      //Serial.print(",");
       //Serial.print(fault);
-      Serial.println();        
-    }    
-  }   
+      Serial.println();
+    }
+  }
+  for (int speed=-250; speed >= 255; speed += 10){
+    setMC33926(pinMotorLeftDir, pinMotorLeftPWM, speed);
+    setMC33926(pinMotorRightDir, pinMotorRightPWM, speed);
+    delay(200);
+    int speed_l = speed;
+    int speed_r = speed;
+    lastticks_l = odometryLeft;
+    lastticks_r = odometryRight;
+    delay(200);
+    unsigned long stopticks_l = ticks_l;
+    unsigned long stopticks_r = ticks_r;
+    unsigned long stopTime = millis() + 1000;
+    for (int i=0; i < 10; i++){
+      //while (millis() < stopTime){
+      int sense_l = 0;
+      sense_l = analogRead(pinMotorLeftSense);
+      int sense_r = 0;
+      sense_r = analogRead(pinMotorRightSense);
+      //measurements.clear();
+      /*for (int i=0; i < 100; i++){
+        sense = analogRead(pinMotorLeftSense);
+       measurements.add(sense);
+      }*/
+      //int fault = digitalRead(pinMotorLeftFault);
+      Serial.print(speed_l);
+      Serial.print(",");
+      Serial.print(speed_r);
+      Serial.print(",");
+      Serial.print(odometryLeft);
+      Serial.print(",");
+      Serial.print(odometryRight);
+      Serial.print(",");
+      Serial.print(stopticks_l-lastticks_l);
+      Serial.print(",");
+      Serial.print(stopticks_r-lastticks_r);
+      Serial.print(",");
+      //float curr;
+      //measurements.getAverage(curr);
+      Serial.print(sense_l);
+      Serial.print(",");
+      Serial.print(sense_r);
+      //Serial.print(",");
+      //Serial.print(fault);
+      Serial.println();
+    }
+  }
   setMC33926(pinMotorLeftDir, pinMotorLeftPWM, 0);
+  setMC33926(pinMotorRightDir, pinMotorRightPWM, 0);
   while (true);
 
 }
